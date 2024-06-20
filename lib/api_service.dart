@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class ApiService {
   static final String _apiKey = dotenv.env['OPENAI_API_KEY']!;  // 환경 변수에서 API 키 로드
 
+  // 단어의 정의와 예문을 가져오는 비동기 함수
   static Future<Map<String, dynamic>> fetchExamples(String word) async {
     final response = await http.post(
       Uri.parse('https://api.openai.com/v1/chat/completions'),
@@ -37,7 +38,7 @@ class ApiService {
       final data = jsonDecode(response.body);
       final responseText = data['choices'][0]['message']['content'] as String;
 
-      // Parsing the response to match the desired format
+      // 응답을 원하는 형식으로 파싱
       final lines = responseText.split('\n').where((line) => line.isNotEmpty).toList();
       final wordDefinition = {
         'word': word,
@@ -45,7 +46,7 @@ class ApiService {
         'examples': <Map<String, String>>[]
       };
 
-      // Extract definition and examples
+      // 정의와 예문 추출
       for (var i = 0; i < lines.length; i++) {
         if (lines[i].startsWith('Definition: ')) {
           wordDefinition['definition'] = lines[i].substring('Definition: '.length).trim();
@@ -69,6 +70,7 @@ class ApiService {
 
       return wordDefinition;
     } else {
+      // 요청 실패 시 처리
       print('Failed to fetch examples: ${response.body}');
       return {
         'word': word,

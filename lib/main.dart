@@ -4,7 +4,7 @@ import 'home_page.dart';
 import 'tutorial_page.dart';
 
 void main() async {
-  // Ensure dotenv is loaded before the app runs
+  // 앱 실행 전에 dotenv를 로드
   await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }

@@ -9,9 +9,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController _controller = TextEditingController();
-  Map<String, dynamic>? _examples;
-  bool _isLoading = false;
+  final TextEditingController _controller = TextEditingController(); // 텍스트 입력 컨트롤러
+  Map<String, dynamic>? _examples; // 예문 데이터
+  bool _isLoading = false; // 로딩 상태
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: _fetchExamples,
-              child: _isLoading ? CircularProgressIndicator() : Text('예문 생성하기!'),
+              child: _isLoading ? CircularProgressIndicator() : Text('예문 생성하기'),
             ),
             SizedBox(height: 16),
             _examples != null ? _buildExamples() : Container(),
@@ -67,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // 예문을 가져오는 함수
   Future<void> _fetchExamples() async {
     setState(() {
       _isLoading = true;
@@ -80,19 +81,20 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // 예문을 표시하는 위젯
   Widget _buildExamples() {
     return Expanded(
       child: ListView(
         children: [
-          Text('단어: ${_examples!['word']}'),
+          Text('단어: ${_examples!['word']}', style: TextStyle(fontWeight: FontWeight.bold, height: 1.5)),
           SizedBox(height: 8),
-          Text('정의: ${_examples!['definition']}'),
+          Text('정의: ${_examples!['definition']}', style: TextStyle(fontWeight: FontWeight.bold, height: 1.5)),
           SizedBox(height: 16),
-          Text('예문:', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('예문:', style: TextStyle(fontWeight: FontWeight.bold, height: 2.0)),
           ..._examples!['examples'].map<Widget>((example) {
             return ListTile(
-              title: Text('Example: ${example['example']}'),
-              subtitle: Text('Description: ${example['explanation']}'),
+              title: Text('Example: ${example['example']}', style: TextStyle(fontWeight: FontWeight.bold, height: 1.5)),
+              subtitle: Text('Description: ${example['explanation']}', style: TextStyle(height: 1.5)),
               trailing: IconButton(
                 icon: Icon(Icons.favorite_border),
                 onPressed: () async {
@@ -105,10 +107,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       SnackBar(content: Text('추가 되었습니다')),
                     );
                   } catch (e) {
-                    print('Error adding favorite: $e');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('즐겨찾기에 추가하는데 실패했습니다.')),
-                    );
+                    if (e.toString().contains('Duplicate example')) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('중복된 예문입니다.')),
+                      );
+                    } else {
+                      print('Error adding favorite: $e');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('즐겨찾기에 추가하는데 실패했습니다.')),
+                      );
+                    }
                   }
                 },
               ),

@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class StorageService {
+  // 즐겨찾기 로드
   static Future<Map<String, Map<String, dynamic>>> loadFavorites() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? favoritesJson = prefs.getString('favorites');
@@ -13,6 +14,7 @@ class StorageService {
     return {};
   }
 
+  // 즐겨찾기 추가
   static Future<void> addFavorite(String word, String definition, Map<String, String> example) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? favoritesJson = prefs.getString('favorites');
@@ -28,6 +30,7 @@ class StorageService {
     prefs.setString('favorites', jsonEncode(favoritesMap));
   }
 
+  // 즐겨찾기 삭제
   static Future<void> removeFavorite(String word) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? favoritesJson = prefs.getString('favorites');
@@ -38,6 +41,7 @@ class StorageService {
     }
   }
 
+  // 예문 삭제
   static Future<void> removeExample(String word, Map<String, String> example) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? favoritesJson = prefs.getString('favorites');
@@ -56,6 +60,7 @@ class StorageService {
     }
   }
 
+  // Map 객체 비교 함수
   static bool mapEquals(Map<String, String> map1, Map<String, String> map2) {
     if (map1.length != map2.length) return false;
     for (String key in map1.keys) {
