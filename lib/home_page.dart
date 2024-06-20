@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'storage_service.dart';
+import 'favorites_page.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -21,11 +22,18 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: Icon(Icons.favorite),
             onPressed: () async {
-              final favorites = await StorageService.loadFavorites();
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => FavoritesPage(favorites: favorites)),
-              );
+              try {
+                final favorites = await StorageService.loadFavorites();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FavoritesPage(favorites: favorites)),
+                );
+              } catch (e) {
+                print('Error loading favorites: $e');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('즐겨찾기를 불러오는데 실패했습니다.')),
+                );
+              }
             },
           ),
         ],
@@ -87,41 +95,26 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('Description: ${example['explanation']}'),
               trailing: IconButton(
                 icon: Icon(Icons.favorite_border),
-                onPressed: () {
-                  StorageService.addFavorite({
-                    'example': example['example'],
-                    'explanation': example['explanation'],
-                  });
+                onPressed: () async {
+                  try {
+                    await StorageService.addFavorite(_examples!['word'], _examples!['definition'], {
+                      'example': example['example'],
+                      'explanation': example['explanation'],
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('추가 되었습니다')),
+                    );
+                  } catch (e) {
+                    print('Error adding favorite: $e');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('즐겨찾기에 추가하는데 실패했습니다.')),
+                    );
+                  }
                 },
               ),
             );
           }).toList(),
         ],
-      ),
-    );
-  }
-}
-
-class FavoritesPage extends StatelessWidget {
-  final List<Map<String, String>> favorites;
-
-  FavoritesPage({required this.favorites});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('즐겨찾기'),
-      ),
-      body: ListView.builder(
-        itemCount: favorites.length,
-        itemBuilder: (context, index) {
-          final favorite = favorites[index];
-          return ListTile(
-            title: Text('Example: ${favorite['example']}'),
-            subtitle: Text('Description: ${favorite['explanation']}'),
-          );
-        },
       ),
     );
   }
